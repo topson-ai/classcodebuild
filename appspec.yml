@@ -1,0 +1,9 @@
+version: 0.0  # appspec.yml 的版本号，固定写法，当前支持的版本是 0.0
+
+os: linux  # 部署的操作系统类型，这里是 Linux
+
+files:  # 定义需要从 S3 下载到 EC2 的文件及其目标位置
+  - source: /dist/shop/  # 源文件路径，从 S3 的 dist/shop 文件夹中获取
+    destination: /var/www/html/  # 目标路径，将文件复制到 EC2 的 /var/www/html 文件夹中
+
+file_exists_behavior: overwrite  # 全局设置，目标路径中已存在文件时，选择覆盖
