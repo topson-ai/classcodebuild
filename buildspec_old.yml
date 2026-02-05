@@ -1,0 +1,37 @@
+# 指定 buildspec.yml 的版本号
+version: 0.2  # 版本号，AWS CodeBuild 支持的配置版本，这里用的是 0.2
+
+# 构建流程的各个阶段（phases）
+phases:
+  # 第一阶段：安装依赖
+  install:  # install 阶段，通常用于安装项目运行所需的软件或库
+    runtime-versions:  # 指定构建环境的运行时版本
+      nodejs: 16  # 使用 Node.js 的版本是 16
+    commands:  # 要在 install 阶段执行的命令列表
+      - echo Installing dependencies...  # 打印日志，提示开始安装依赖
+      - npm install  # 使用 npm 安装项目的依赖库
+
+  # 第二阶段：预构建
+  pre_build:  # pre_build 阶段，通常用于准备构建的环境或运行一些测试命令
+    commands:  # 要在 pre_build 阶段执行的命令列表
+      - echo Nothing to do...  # 打印日志，说明此阶段没有大的任务
+      - ls -l  # 列出当前目录下的所有文件和目录，帮助调试构建环境
+
+  # 第三阶段：构建
+  build:  # build 阶段，是构建的核心阶段，执行编译和打包任务
+    commands:  # 要在 build 阶段执行的命令列表
+      - echo Build started on `date`  # 打印日志，显示构建开始的时间
+      - npm run build  # 使用 npm 执行构建命令（通常定义在 package.json 文件中）
+      - ls -l  # 再次列出当前目录下的文件，检查构建生成的文件
+
+  # 第四阶段：构建后操作
+  post_build:  # post_build 阶段，通常用于完成构建后的清理或发布任务
+    commands:  # 要在 post_build 阶段执行的命令列表
+      - echo Build completed on `date`  # 打印日志，显示构建完成的时间
+
+# 构建产物的输出文件配置
+artifacts:  # 定义构建完成后要保存的文件或目录
+  files:  # 指定哪些文件或目录需要保存（支持通配符）
+    - dist/shop/*  # 保存 dist/shop 文件夹下的所有文件
+    - appspec.yml
+    - dist/shop/assets/*  # 保存 dist/shop/assets 文件夹下的所有文件
