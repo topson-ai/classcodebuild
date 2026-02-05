@@ -1,25 +1,39 @@
 version: 0.2
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+    commands:
+      - echo Installing dependencies...
+      - npm install
+
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 635457412353.dkr.ecr.ap-northeast-1.amazonaws.com
       - echo Setting up environment variables...
       - REPO_URI=635457412353.dkr.ecr.ap-northeast-1.amazonaws.com/topson0205
-      - IMAGE_TAG=$(date +%Y%m%d%H%M%S)  # 使用时间戳标记镜像
+      - IMAGE_TAG=$(date +%Y%m%d%H%M%S)
+      - echo Building Angular application...  # 新增
+      - npm run build  # 新增：在这里生成 dist/ 目录
+      - ls -la dist/   # 新增：确认 dist/ 目录已生成
+
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t $REPO_URI:latest .  # 构建镜像并标记为最新
-      - docker tag $REPO_URI:latest $REPO_URI:$IMAGE_TAG  # 标记镜像为带时间戳的版本
+      - docker build -t $REPO_URI:latest .
+      - docker tag $REPO_URI:latest $REPO_URI:$IMAGE_TAG
+
   post_build:
     commands:
       - echo Pushing the Docker images to ECR...
-      - docker push $REPO_URI:latest  # 推送最新的镜像
-      - docker push $REPO_URI:$IMAGE_TAG  # 推送带时间戳的镜像
-      - echo Creating imagedefinitions.json file...
-      - printf '[{"name":"web","imageUri":"%s"}]' $REPO_URI:$IMAGE_TAG > imagedefinitions.json
+      - docker push $REPO_URI:latest
+      - docker push $REPO_URI:$IMAGE_TAG
+      - echo Writing imagedefinitions.json...
+      - printf '[{"name":"web","imageUri":"%s"}]' $REPO_URI:latest > imagedefinitions.json
+      - cat imagedefinitions.json  # 确认文件内容
+
 artifacts:
   files:
-    - imagedefinitions.json  # 将 imagedefinitions.json 保存为构建产物
+    - imagedefinitions.json
