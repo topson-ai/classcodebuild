@@ -33,4 +33,5 @@ phases:
 artifacts:  # 定义构建完成后要保存的文件或目录
   files:  # 指定哪些文件或目录需要保存（支持通配符）
     - dist/shop/*  # 保存 dist/shop 文件夹下的所有文件
+    - appspec.yml
     - dist/shop/assets/*  # 保存 dist/shop/assets 文件夹下的所有文件
